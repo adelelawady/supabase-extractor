@@ -39,6 +39,7 @@ BEGIN
     JOIN pg_namespace n ON p.pronamespace = n.oid
     JOIN pg_language l ON p.prolang = l.oid
     WHERE n.nspname NOT IN ('pg_catalog', 'information_schema')
+    AND p.prokind = 'f'  -- Only normal functions, exclude aggregates
     ORDER BY n.nspname, p.proname;
 END;
 $$;

@@ -167,7 +167,7 @@ function generateSQLScript(data: ExtractedData): string {
   // Add policies
   script += '-- Policies\n';
   data.policies.forEach(policy => {
-    script += `CREATE POLICY "${policy.name}" ON ${policy.table}\n`;
+    script += `CREATE POLICY "${policy.name}" ON ${policy.table_name}\n`;
     script += `  FOR ${policy.command}\n`;
     script += `  USING (${policy.definition});\n\n`;
   });
