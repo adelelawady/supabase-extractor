@@ -1,6 +1,6 @@
 export interface Policy {
   name: string;
-  table: string;
+  table_name: string;
   command: string;
   definition: string;
 }

@@ -9,10 +9,10 @@ RETURNS TABLE (
 BEGIN
     RETURN QUERY
     SELECT 
-        p.policyname::text as name,
-        p.tablename::text as table_name,
-        p.cmd::text as command,
-        p.qual::text as definition
+        p.policyname::text,
+        p.tablename::text,
+        p.cmd::text,
+        p.qual::text
     FROM pg_policies p
     ORDER BY p.tablename, p.policyname;
 END;
@@ -30,11 +30,11 @@ RETURNS TABLE (
 BEGIN
     RETURN QUERY
     SELECT 
-        p.proname::text as name,
-        n.nspname::text as schema,
-        l.lanname::text as language,
-        pg_get_functiondef(p.oid)::text as definition,
-        pg_get_function_arguments(p.oid)::text as arguments
+        p.proname::text,
+        n.nspname::text,
+        l.lanname::text,
+        pg_get_functiondef(p.oid)::text,
+        pg_get_function_arguments(p.oid)::text
     FROM pg_proc p
     JOIN pg_namespace n ON p.pronamespace = n.oid
     JOIN pg_language l ON p.prolang = l.oid

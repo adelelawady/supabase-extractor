@@ -20,7 +20,7 @@ export function PolicyTable({ policies }: PolicyTableProps) {
         {policies.map((policy, index) => (
           <TableRow key={index}>
             <TableCell className="font-medium">{policy.name}</TableCell>
-            <TableCell>{policy.table}</TableCell>
+            <TableCell>{policy.table_name}</TableCell>
             <TableCell>{policy.command}</TableCell>
             <TableCell className="font-mono text-sm">{policy.definition}</TableCell>
           </TableRow>
