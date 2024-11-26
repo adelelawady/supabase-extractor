@@ -7,7 +7,7 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-6 py-12 md:flex md:items-center md:justify-between lg:px-8">
         <div className="flex justify-center space-x-6 md:order-2">
           <a
-            href="https://github.com/adelelawady"
+            href="https://adelelawady.github.io/supabase-extractor/"
             className="text-gray-400 hover:text-gray-500"
             target="_blank"
             rel="noopener noreferrer"
