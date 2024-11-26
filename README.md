@@ -1,69 +1,132 @@
-# Welcome to your Lovable project
+# Supabase Extractor
 
-## Project info
+A tool to extract and manage Supabase database policies, functions, and triggers.
 
-**URL**: https://lovable.dev/projects/f2d32dc4-f81a-4961-98ab-86713bb304f9
+## Features
 
-## How can I edit this code?
+- Extract database policies, functions, and triggers from Supabase projects
+- Configurable schema exclusions for functions and triggers
+- Export extracted data as SQL scripts
+- Option to include DROP POLICY statements
+- User-friendly error handling and setup instructions
 
-There are several ways of editing your application.
+## Getting Started
 
-**Use Lovable**
+1. Clone the repository
+```
+git clone https://github.com/adelelawady/supabase-extractor.git
+cd supabase-extractor
+```
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/f2d32dc4-f81a-4961-98ab-86713bb304f9) and start prompting.
+2. Install dependencies
 
-Changes made via Lovable will be committed automatically to this repo.
+```
+npm install
+```
 
-**Use your preferred IDE**
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+3. Run the development server
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+## Usage
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+1. **Initial Setup**
+   - Run the setup SQL in your Supabase SQL editor
+   - Configure excluded schemas for functions and triggers
+   - Run the setup SQL using the UI
 
-**Use GitHub Codespaces**
+2. **Extract Database Objects**
+   - Enter your Supabase project URL
+   - Enter your service role API key
+   - Click "Extract Data"
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+3. **Export Data**
+   - View extracted policies, functions, and triggers
+   - Toggle "Include DROP POLICY statements" if needed
+   - Click "Export SQL" to download the SQL script
 
-## What technologies are used for this project?
+4. **Cleanup (Important)**
+   After extracting your data, it's recommended to remove the setup functions for security. Run this SQL in your Supabase SQL editor:
+   ```sql
+   -- Remove setup functions
+   DROP FUNCTION IF EXISTS public.exec_sql(text);
+   DROP FUNCTION IF EXISTS public.get_policies();
+   DROP FUNCTION IF EXISTS public.get_functions();
+   DROP FUNCTION IF EXISTS public.get_triggers();
+   ```
 
-This project is built with .
+## Configuration
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Function Schemas
+By default, the following schemas are excluded from function extraction:
+- pg_catalog
+- information_schema
+- extensions
+- pgsodium
+- storage
+- realtime
+- vault
 
-## How can I deploy this project?
+### Trigger Schemas
+By default, the following schemas are excluded from trigger extraction:
+- pgsodium
+- storage
+- realtime
+- vault
 
-Simply open [Lovable](https://lovable.dev/projects/f2d32dc4-f81a-4961-98ab-86713bb304f9) and click on Share -> Publish.
+You can modify these exclusions through the UI's Setup Configuration section.
 
-## I want to use a custom domain - is that possible?
+## Security
 
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+- No credentials are stored
+- All operations are performed client-side
+- Database connections use Supabase's secure API
+- Remember to remove setup functions after use
+
+## Error Handling
+
+The tool provides detailed error messages for common issues:
+- Missing setup functions
+- Invalid credentials
+- Permission issues
+- Connection timeouts
+- Invalid data structures
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## Documentation
+
+For more detailed information, see:
+- [Privacy Policy](PRIVACY.md)
+- [Terms and Conditions](TERMS.md)
+- [License](LICENSE)
+
+## Author
+
+Created by [Adel Elawady](https://github.com/adelelawady)
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Support
+
+If you encounter any issues or have questions:
+- Open an [issue](https://github.com/adelelawady/supabase-extractor/issues)
+- Contact via [GitHub](https://github.com/adelelawady)
+
+## Acknowledgments
+
+- Built with [React](https://reactjs.org/)
+- Styled with [Tailwind CSS](https://tailwindcss.com/)
+- UI components from [shadcn/ui](https://ui.shadcn.com/)
+- Database access via [Supabase](https://supabase.com/)

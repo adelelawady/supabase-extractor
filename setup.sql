@@ -38,7 +38,7 @@ BEGIN
     FROM pg_proc p
     JOIN pg_namespace n ON p.pronamespace = n.oid
     JOIN pg_language l ON p.prolang = l.oid
-    WHERE n.nspname NOT IN ('pg_catalog', 'information_schema')
+    WHERE n.nspname NOT IN ('pg_catalog', 'information_schema', 'extensions')
     AND p.prokind = 'f'  -- Only normal functions, exclude aggregates
     AND p.proowner = (SELECT usesysid FROM pg_user WHERE usename = current_user)  -- Only user-created functions
     ORDER BY n.nspname, p.proname;
@@ -71,7 +71,9 @@ BEGIN
         pg_get_triggerdef(t.oid)::text
     FROM pg_trigger t
     JOIN pg_class c ON t.tgrelid = c.oid
+    JOIN pg_namespace n ON c.relnamespace = n.oid
     WHERE NOT t.tgisinternal
+    AND n.nspname NOT IN ('pgsodium','storage','realtime','vault')
     ORDER BY c.relname, t.tgname;
 END;
 $$;
