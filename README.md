@@ -2,6 +2,8 @@
 
 A tool to extract and manage Supabase database policies, functions, and triggers.
 
+
+[Live-Demo](https://adelelawady.github.io/supabase-extractor/)
 ## Features
 
 - Extract database policies, functions, and triggers from Supabase projects

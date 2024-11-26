@@ -322,6 +322,13 @@ GRANT EXECUTE ON FUNCTION exec_sql(text) TO authenticated;`}
                   Then run the setup SQL from the configuration below.
                 </p>
               </div>
+              <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+              <h3 className="font-medium text-yellow-800">⚠️ Important Security Note</h3>
+              <p className="text-sm text-yellow-700 mt-1">
+                For security reasons, remember to remove the setup functions after extracting your data. 
+                You can find cleanup instructions in the section below.
+              </p>
+            </div>
             </div>
           </Card>
 
