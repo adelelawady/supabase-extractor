@@ -13,7 +13,16 @@ export interface Function {
   arguments: string;
 }
 
+export interface Trigger {
+  name: string;
+  table_name: string;
+  event: string;
+  timing: string;
+  definition: string;
+}
+
 export interface ExtractedData {
   policies: Policy[];
   functions: Function[];
+  triggers: Trigger[];
 }

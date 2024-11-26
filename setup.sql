@@ -40,10 +40,43 @@ BEGIN
     JOIN pg_language l ON p.prolang = l.oid
     WHERE n.nspname NOT IN ('pg_catalog', 'information_schema')
     AND p.prokind = 'f'  -- Only normal functions, exclude aggregates
+    AND p.proowner = (SELECT usesysid FROM pg_user WHERE usename = current_user)  -- Only user-created functions
     ORDER BY n.nspname, p.proname;
+END;
+$$;
+
+-- Function to get all triggers
+CREATE OR REPLACE FUNCTION public.get_triggers()
+RETURNS TABLE (
+    name text,
+    table_name text,
+    event text,
+    timing text,
+    definition text
+) LANGUAGE plpgsql SECURITY DEFINER AS $$
+BEGIN
+    RETURN QUERY
+    SELECT 
+        t.tgname::text,
+        c.relname::text,
+        CASE 
+            WHEN t.tgtype & 1 = 1 THEN 'ROW'
+            ELSE 'STATEMENT'
+        END::text,
+        CASE 
+            WHEN t.tgtype & 2 = 2 THEN 'BEFORE'
+            WHEN t.tgtype & 64 = 64 THEN 'INSTEAD OF'
+            ELSE 'AFTER'
+        END::text,
+        pg_get_triggerdef(t.oid)::text
+    FROM pg_trigger t
+    JOIN pg_class c ON t.tgrelid = c.oid
+    WHERE NOT t.tgisinternal
+    ORDER BY c.relname, t.tgname;
 END;
 $$;
 
 -- Grant execute permissions
 GRANT EXECUTE ON FUNCTION public.get_policies() TO authenticated;
 GRANT EXECUTE ON FUNCTION public.get_functions() TO authenticated;
+GRANT EXECUTE ON FUNCTION public.get_triggers() TO authenticated;

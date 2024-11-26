@@ -42,7 +42,13 @@ export default function Index() {
       
       if (functionsError) throw functionsError;
 
-      setData({ policies, functions });
+      // Extract triggers
+      const { data: triggers, error: triggersError } = await supabase
+        .rpc('get_triggers');
+      
+      if (triggersError) throw triggersError;
+
+      setData({ policies, functions, triggers });
       toast({
         title: "Success",
         description: "Successfully extracted database information",
@@ -81,7 +87,7 @@ export default function Index() {
             Supabase Extractor
           </h1>
           <p className="text-gray-600">
-            Extract and export your Supabase database policies and functions
+            Extract and export your Supabase database policies, functions, and triggers
           </p>
         </div>
 
@@ -137,6 +143,9 @@ export default function Index() {
                 <TabsTrigger value="functions" className="flex-1">
                   Functions ({data.functions.length})
                 </TabsTrigger>
+                <TabsTrigger value="triggers" className="flex-1">
+                  Triggers ({data.triggers.length})
+                </TabsTrigger>
               </TabsList>
               <TabsContent value="policies">
                 <PolicyTable policies={data.policies} />
@@ -148,6 +157,18 @@ export default function Index() {
                       key={index}
                       title={func.name}
                       code={func.definition}
+                      language="sql"
+                    />
+                  ))}
+                </div>
+              </TabsContent>
+              <TabsContent value="triggers">
+                <div className="space-y-4">
+                  {data.triggers.map((trigger, index) => (
+                    <CodeBlock
+                      key={index}
+                      title={`${trigger.name} (${trigger.table_name})`}
+                      code={trigger.definition}
                       language="sql"
                     />
                   ))}
@@ -175,10 +196,13 @@ function generateSQLScript(data: ExtractedData): string {
   // Add functions
   script += '-- Functions\n';
   data.functions.forEach(func => {
-    script += `CREATE OR REPLACE FUNCTION ${func.schema}.${func.name}(${func.arguments})\n`;
-    script += `RETURNS ${func.definition.split('RETURNS ')[1].split('\n')[0]}\n`;
-    script += `LANGUAGE ${func.language}\n`;
-    script += `AS $$\n${func.definition}$$;\n\n`;
+    script += `${func.definition}\n\n`;
+  });
+
+  // Add triggers
+  script += '-- Triggers\n';
+  data.triggers.forEach(trigger => {
+    script += `${trigger.definition};\n\n`;
   });
   
   return script;
