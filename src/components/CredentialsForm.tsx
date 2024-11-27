@@ -4,14 +4,17 @@ import { Card } from "./ui/card";
 import { useState } from "react";
 
 interface CredentialsFormProps {
-  onSetup: () => Promise<void>;
-  onExtract: () => Promise<void>;
+  onSetup: (url: string, key: string) => Promise<void>;
+  onExtract: (url: string, key: string) => Promise<void>;
   loading: boolean;
 }
 
 export function CredentialsForm({ onSetup, onExtract, loading }: CredentialsFormProps) {
   const [url, setUrl] = useState('');
   const [key, setKey] = useState('');
+
+  const handleSetup = () => onSetup(url, key);
+  const handleExtract = () => onExtract(url, key);
 
   return (
     <Card className="p-6 mb-8 animate-fade-in">
@@ -43,7 +46,7 @@ export function CredentialsForm({ onSetup, onExtract, loading }: CredentialsForm
         </div>
         <div className="flex gap-4 pt-2">
           <Button
-            onClick={onSetup}
+            onClick={handleSetup}
             disabled={loading}
             variant="outline"
             className="flex-1 hover:bg-secondary hover:text-white transition-colors"
@@ -51,7 +54,7 @@ export function CredentialsForm({ onSetup, onExtract, loading }: CredentialsForm
             {loading ? "Setting up..." : "Run Setup SQL"}
           </Button>
           <Button
-            onClick={onExtract}
+            onClick={handleExtract}
             disabled={loading}
             className="flex-1 bg-secondary hover:bg-secondary/90 transition-colors"
           >
