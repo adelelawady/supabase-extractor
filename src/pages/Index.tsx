@@ -1,26 +1,16 @@
 import { useState } from 'react';
 import { createSupabaseClient } from '@/lib/supabase';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ExtractedData } from '@/types/supabase';
-import { CodeBlock } from '@/components/CodeBlock';
-import { PolicyTable } from '@/components/PolicyTable';
-import { Textarea } from '@/components/ui/textarea';
+import { Header } from '@/components/Header';
+import { SetupInstructions } from '@/components/SetupInstructions';
+import { CredentialsForm } from '@/components/CredentialsForm';
+import { ResultsTabs } from '@/components/ResultsTabs';
 import { Footer } from "@/components/ui/footer";
 
-// Default excluded schemas
-const DEFAULT_EXCLUDED_SCHEMAS = ['pg_catalog', 'information_schema', 'extensions', 'pgsodium', 'storage', 'realtime', 'vault'];
-
 export default function Index() {
-  const [url, setUrl] = useState('');
-  const [key, setKey] = useState('');
   const [loading, setLoading] = useState(false);
   const [data, setData] = useState<ExtractedData | null>(null);
-  const [excludedFunctionSchemas, setExcludedFunctionSchemas] = useState<string[]>(DEFAULT_EXCLUDED_SCHEMAS);
-  const [excludedTriggerSchemas, setExcludedTriggerSchemas] = useState<string[]>(['pgsodium', 'storage', 'realtime', 'vault']);
   const [includeDropPolicy, setIncludeDropPolicy] = useState(false);
   const { toast } = useToast();
 
@@ -114,6 +104,7 @@ GRANT EXECUTE ON FUNCTION public.get_policies() TO authenticated;
 GRANT EXECUTE ON FUNCTION public.get_functions() TO authenticated;
 GRANT EXECUTE ON FUNCTION public.get_triggers() TO authenticated;
     `;
+
   };
 
   // Function to run setup SQL
@@ -271,238 +262,22 @@ GRANT EXECUTE ON FUNCTION public.get_triggers() TO authenticated;
 
   return (
     <>
-      <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-primary mb-2">
-              Supabase Extractor
-            </h1>
-            <p className="text-gray-600">
-              Extract and export your Supabase database policies, functions, and triggers
-            </p>
-          </div>
-
-          {/* Setup Instructions Card */}
-          <Card className="p-6 mb-8">
-            <h2 className="text-xl font-semibold mb-4">Setup Instructions</h2>
-            <div className="space-y-4">
-              <p className="text-sm text-gray-600">
-                Before using the extractor, you need to set up the required database functions. You have two options:
-              </p>
-              
-              <div className="space-y-2">
-                <h3 className="font-medium">Option 1: Run Setup SQL</h3>
-                <p className="text-sm text-gray-600">
-                  Enter your credentials below and click "Run Setup SQL" to automatically set up the required functions.
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <h3 className="font-medium">Option 2: Manual Setup</h3>
-                <p className="text-sm text-gray-600">
-                  Run the following SQL in your Supabase SQL editor first:
-                </p>
-                <CodeBlock
-                  title="Required Setup SQL"
-                  code={`-- Function to execute SQL
-CREATE OR REPLACE FUNCTION exec_sql(sql text)
-RETURNS void
-LANGUAGE plpgsql
-SECURITY DEFINER
-AS $$
-BEGIN
-  EXECUTE sql;
-END;
-$$;
-
-GRANT EXECUTE ON FUNCTION exec_sql(text) TO authenticated;`}
-                  language="sql"
-                />
-                <p className="text-sm text-gray-600">
-                  Then run the setup SQL from the configuration below.
-                </p>
-              </div>
-              <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-md">
-              <h3 className="font-medium text-yellow-800">⚠️ Important Security Note</h3>
-              <p className="text-sm text-yellow-700 mt-1">
-                For security reasons, remember to remove the setup functions after extracting your data. 
-                You can find cleanup instructions in the section below.
-              </p>
-            </div>
-            </div>
-          </Card>
-
-          {/* Setup Configuration Card */}
-          <Card className="p-6 mb-8">
-            <h2 className="text-xl font-semibold mb-4">Setup Configuration</h2>
-            <div className="space-y-6">
-              {/* Functions Configuration */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium">Functions Configuration</h3>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Excluded Function Schemas
-                  </label>
-                  <Textarea
-                    value={excludedFunctionSchemas.join('\n')}
-                    onChange={(e) => setExcludedFunctionSchemas(e.target.value.split('\n').filter(Boolean))}
-                    placeholder="Enter schemas to exclude from functions (one per line)"
-                    className="h-32"
-                  />
-                  <p className="text-sm text-gray-500 mt-1">
-                    These schemas will be excluded from function extraction
-                  </p>
-                </div>
-                <Button
-                  variant="outline"
-                  onClick={() => setExcludedFunctionSchemas(DEFAULT_EXCLUDED_SCHEMAS)}
-                  className="w-full sm:w-auto"
-                >
-                  Reset Function Schemas
-                </Button>
-              </div>
-
-              <div className="border-t border-gray-200" />
-
-              {/* Triggers Configuration */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium">Triggers Configuration</h3>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Excluded Trigger Schemas
-                  </label>
-                  <Textarea
-                    value={excludedTriggerSchemas.join('\n')}
-                    onChange={(e) => setExcludedTriggerSchemas(e.target.value.split('\n').filter(Boolean))}
-                    placeholder="Enter schemas to exclude from triggers (one per line)"
-                    className="h-32"
-                  />
-                  <p className="text-sm text-gray-500 mt-1">
-                    These schemas will be excluded from trigger extraction
-                  </p>
-                </div>
-                <Button
-                  variant="outline"
-                  onClick={() => setExcludedTriggerSchemas(['pgsodium', 'storage', 'realtime', 'vault'])}
-                  className="w-full sm:w-auto"
-                >
-                  Reset Trigger Schemas
-                </Button>
-              </div>
-
-              <div className="border-t border-gray-200" />
-
-              {/* Run Setup Button */}
-              <div className="flex justify-end">
-                <Button
-                  onClick={handleRunSetup}
-                  disabled={loading}
-                >
-                  {loading ? "Running Setup..." : "Run Setup SQL"}
-                </Button>
-              </div>
-            </div>
-          </Card>
-
-          {/* Credentials Card */}
-          <Card className="p-6 mb-8">
-            <div className="grid gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Supabase URL
-                </label>
-                <Input
-                  type="text"
-                  value={url}
-                  onChange={(e) => setUrl(e.target.value)}
-                  placeholder="https://your-project.supabase.co"
-                  className="w-full"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  API Key
-                </label>
-                <Input
-                  type="password"
-                  value={key}
-                  onChange={(e) => setKey(e.target.value)}
-                  placeholder="your-api-key"
-                  className="w-full"
-                />
-              </div>
-              <Button
-                onClick={handleExtract}
-                disabled={loading}
-                className="w-full"
-              >
-                {loading ? "Extracting..." : "Extract Data"}
-              </Button>
-            </div>
-          </Card>
-
-          {/* Results Section */}
+      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto space-y-8">
+          <Header />
+          <SetupInstructions />
+          <CredentialsForm
+            onSetup={handleRunSetup}
+            onExtract={handleExtract}
+            loading={loading}
+          />
           {data && (
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="checkbox"
-                    id="dropPolicy"
-                    checked={includeDropPolicy}
-                    onChange={(e) => setIncludeDropPolicy(e.target.checked)}
-                    className="rounded border-gray-300"
-                  />
-                  <label htmlFor="dropPolicy" className="text-sm text-gray-600">
-                    Include DROP POLICY statements
-                  </label>
-                </div>
-                <Button onClick={handleExport} variant="outline">
-                  Export SQL
-                </Button>
-              </div>
-              
-              <Tabs defaultValue="policies" className="w-full">
-                <TabsList className="w-full">
-                  <TabsTrigger value="policies" className="flex-1">
-                    Policies ({data.policies.length})
-                  </TabsTrigger>
-                  <TabsTrigger value="functions" className="flex-1">
-                    Functions ({data.functions.length})
-                  </TabsTrigger>
-                  <TabsTrigger value="triggers" className="flex-1">
-                    Triggers ({data.triggers.length})
-                  </TabsTrigger>
-                </TabsList>
-                <TabsContent value="policies">
-                  <PolicyTable policies={data.policies} />
-                </TabsContent>
-                <TabsContent value="functions">
-                  <div className="space-y-4">
-                    {data.functions.map((func, index) => (
-                      <CodeBlock
-                        key={index}
-                        title={func.name}
-                        code={func.definition}
-                        language="sql"
-                      />
-                    ))}
-                  </div>
-                </TabsContent>
-                <TabsContent value="triggers">
-                  <div className="space-y-4">
-                    {data.triggers.map((trigger, index) => (
-                      <CodeBlock
-                        key={index}
-                        title={`${trigger.name} (${trigger.table_name})`}
-                        code={trigger.definition}
-                        language="sql"
-                      />
-                    ))}
-                  </div>
-                </TabsContent>
-              </Tabs>
-            </div>
+            <ResultsTabs
+              data={data}
+              includeDropPolicy={includeDropPolicy}
+              onExport={handleExport}
+              onToggleDropPolicy={setIncludeDropPolicy}
+            />
           )}
         </div>
       </div>
