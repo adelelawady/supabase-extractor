@@ -8,7 +8,6 @@ import { CredentialsForm } from '@/components/CredentialsForm';
 import { ResultsTabs } from '@/components/ResultsTabs';
 import { Footer } from "@/components/ui/footer";
 import { useSetupSQL } from '@/hooks/useSetupSQL';
-import { excludedFunctionSchemas, excludedTriggerSchemas } from '@/lib/constants';
 
 export default function Index() {
   const [loading, setLoading] = useState(false);
@@ -115,6 +114,13 @@ export default function Index() {
     }
   };
 
+  const handleExport = () => {
+    if (!data) return;
+    const script = generateSQLScript(data, includeDropPolicy);
+    // Here you could add logic to download or copy the script
+    console.log(script);
+  };
+
   return (
     <>
       <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-12 px-4 sm:px-6 lg:px-8">
@@ -130,7 +136,7 @@ export default function Index() {
             <ResultsTabs
               data={data}
               includeDropPolicy={includeDropPolicy}
-              onExport={generateSQLScript}
+              onExport={handleExport}
               onToggleDropPolicy={setIncludeDropPolicy}
             />
           )}
